@@ -1,13 +1,33 @@
----
-
 environments:
   - name: acceptance
+    cluster:
+      maxSize: 2
+    vpcTarget:
+      vpcId: vpc-0c00d304ac554a97f
+      instanceSubnetIds:
+        - subnet-00fa748acab0f0585
+        - subnet-05a1407456ad0c8e8
+      elbSubnetIds:
+        - subnet-00fa748acab0f0585
+        - subnet-05a1407456ad0c8e8
+  - name: production
+    cluster:
+      maxSize: 5
 
-service:
-  port: 80
+service:  
+  name: sample-service
   healthEndpoint: /
+  port: 80
   pathPatterns:
     - /*
   pipeline:
-    production:
-      disabled: true
+    source:
+      provicer: GitHub
+      repo: mneil/aftp-mu
+      branch: master
+  environment:
+    SPRING_DATASOURCE_USERNAME: ${DatabaseMasterUsername}
+    SPRING_DATASOURCE_PASSWORD: ${DatabaseMasterPassword}
+    SPRING_DATASOURCE_URL: jdbc:mysql://${DatabaseEndpointAddress}:${DatabaseEndpointPort}/${DatabaseName}
+  database:
+    name: sample
